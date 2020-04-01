@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import './Register.scss';
-import firebase from '../../../config/firebase';
+import Button from '../../../components/atoms/Button';
+import { registerUserAPI } from '../../../config/redux/action';
+import { connect } from 'react-redux'
+
 
 export class Register extends Component {
     state = {
@@ -17,17 +20,7 @@ export class Register extends Component {
 
     handleRegisterSubmit = () => {
         const { email, password } = this.state;
-
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then(res => {
-                console.log(res);
-            })
-            .catch(function (error) {
-                // Handle Errors here.
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                console.log(errorCode, errorMessage);
-            });
+        this.props.registerAPI({ email, password })
     }
 
     render() {
@@ -37,7 +30,8 @@ export class Register extends Component {
                     <p className="auth-title">Register Page</p>
                     <input className="input" id="email" type="text" placeholder="Email" onChange={this.handleChangeText} />
                     <input className="input" id="password" type="password" placeholder="Password" onChange={this.handleChangeText} />
-                    <button className="btn" onClick={this.handleRegisterSubmit}>Register</button>
+                    {/* <button className="btn" onClick={this.handleRegisterSubmit}>Register</button> */}
+                    <Button onClick={this.handleRegisterSubmit} title="Register" loading={this.props.isLoading} />
                     {/* <button>Go to Dashboard</button> */}
                 </div>
             </div>
@@ -45,4 +39,12 @@ export class Register extends Component {
     }
 }
 
-export default Register;
+const reduxState = (state) => ({
+    isLoading: state.isLoading
+})
+
+const reduxDispatch = (dispatch) => ({
+    registerAPI: (data) => dispatch(registerUserAPI(data))
+})
+
+export default connect(reduxState, reduxDispatch)(Register);
